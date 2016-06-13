@@ -62,11 +62,11 @@ public class AndroidMovieAdapter extends ArrayAdapter<AndroidMovie> {
                 .fit() // will explain later
                 .into(iconView);
 
-        TextView versionNameView = (TextView) convertView.findViewById(R.id.list_item_version_name);
-        versionNameView.setText(androidMovie.title);
+        TextView titleView = (TextView) convertView.findViewById(R.id.list_item_title);
+        titleView.setText(androidMovie.title);
 
-        TextView versionNumberView = (TextView) convertView.findViewById(R.id.list_item_versionnumber_textview);
-        versionNumberView.setText(androidMovie.release_date);
+        TextView releaseDateView = (TextView) convertView.findViewById(R.id.list_item_release_date);
+        releaseDateView.setText(androidMovie.release_date);
         return convertView;
     }
 }

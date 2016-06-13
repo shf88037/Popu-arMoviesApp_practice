@@ -5,4 +5,5 @@
     <string name="action_top_rated">top rated</string>
     <string name="action_upcoming">upcoming</string>
     <string name="action_now_playing">now_playing</string>
+    <string name="title_activity_detail">Movie Detail</string>
 </resources>

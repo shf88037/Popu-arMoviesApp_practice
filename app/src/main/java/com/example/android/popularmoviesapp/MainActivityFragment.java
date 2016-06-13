@@ -1,5 +1,6 @@
 package com.example.android.popularmoviesapp;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import org.json.JSONArray;
@@ -103,6 +105,14 @@ public class MainActivityFragment extends Fragment {
         // Get a reference to the ListView, and attach this adapter to it.
         GridView gridView = (GridView) rootView.findViewById(R.id.list_view_movie);
         gridView.setAdapter(mMovieAdapter);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                AndroidMovie movieData = mMovieAdapter.getItem(position);
+                Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra("movie_info",movieData);
+                startActivity(intent);
+            }
+        });
         return rootView;
 
     }
@@ -183,7 +193,6 @@ public class MainActivityFragment extends Fragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            //Log.v("Result", movieJsonStr);
             return null;
         }
 
@@ -212,7 +221,6 @@ public class MainActivityFragment extends Fragment {
 
         JSONObject movieJson = new JSONObject(movieJsonStr);
         JSONArray movieArray = movieJson.getJSONArray(OWM_LIST);
-        //String[] resultStrs = new String[movieArray.length()];
         AndroidMovie[] movie = new AndroidMovie[movieArray.length()];
 
         for(int i = 0; i < movieArray.length(); i++) {
@@ -223,7 +231,6 @@ public class MainActivityFragment extends Fragment {
             String rating = movieInfo.getString(OWM_RATING);
             String release_date = movieInfo.getString(OWM_RELEASE);
             movie[i] = new AndroidMovie(title, posterPath, overview, rating, release_date);
-            //resultStrs[i] = BASE_PATH + posterPath;
         }
 
         return movie;
