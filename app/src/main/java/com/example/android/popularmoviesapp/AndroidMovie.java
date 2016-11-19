@@ -7,32 +7,31 @@ import android.util.Log;
 /**
  * Created by poornima-udacity on 6/26/15.
  */
-public class AndroidMovie  implements Parcelable{
-    String title;
-    String posterPath; // drawable reference id
-    String overview;
-    String rating;
-    String release_date;
+public class AndroidMovie  implements Parcelable {
+    private String title;
+    private String posterPath; // drawable reference id
+    private String overview;
+    private String rating;
+    private String release_date;
 
-    public AndroidMovie(String title, String posterPath, String overview, String rating, String release_date)
-    {
+    public AndroidMovie (String title, String posterPath, String overview, String rating, String release_date) {
         this.title = title;
         this.posterPath = posterPath;
         this.overview = overview;
         this.rating = rating;
         this.release_date = release_date;
     }
-    public AndroidMovie(Parcel in) {
+    public AndroidMovie (Parcel in) {
         Log.d("TestParcel","SourceObject(Parcel in)");
         readFromParcel(in);
     }
 
-    public int describeContents() {
+    public int describeContents () {
         Log.d("TestParcel","describeContents()");
         return 0;
     }
 
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel (Parcel dest, int flags) {
         Log.d("TestParcel","writeToParcel()");
         dest.writeString(title);
         dest.writeString(posterPath);
@@ -41,7 +40,7 @@ public class AndroidMovie  implements Parcelable{
         dest.writeString(release_date);
     }
 
-    private void readFromParcel(Parcel in) {
+    private void readFromParcel (Parcel in) {
         Log.d("TestParcel","readFromParcel()");
         title = in.readString();
         posterPath = in.readString();

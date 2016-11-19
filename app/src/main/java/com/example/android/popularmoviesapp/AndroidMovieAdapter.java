@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -58,15 +57,9 @@ public class AndroidMovieAdapter extends ArrayAdapter<AndroidMovie> {
         ImageView iconView = (ImageView) convertView.findViewById(R.id.list_item_icon);
         Picasso
                 .with(context)
-                .load(androidMovie.posterPath)
-                .fit() // will explain later
+                .load(androidMovie.getPosterPath())
                 .into(iconView);
 
-        TextView titleView = (TextView) convertView.findViewById(R.id.list_item_title);
-        titleView.setText(androidMovie.title);
-
-        TextView releaseDateView = (TextView) convertView.findViewById(R.id.list_item_release_date);
-        releaseDateView.setText(androidMovie.release_date);
         return convertView;
     }
 }

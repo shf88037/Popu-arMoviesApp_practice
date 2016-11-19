@@ -66,19 +66,19 @@ public class MainActivityFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_popular){
-            updateMovie("popular");
+            updateMovie(getString(R.string.query_popular));
             return true;
         }
         if (id == R.id.action_top_rated){
-            updateMovie("top_rated");
+            updateMovie(getString(R.string.query_top_rated));
             return true;
         }
         if (id == R.id.action_now_playing){
-            updateMovie("now_playing");
+            updateMovie(getString(R.string.query_now_playing));
             return true;
         }
         if (id == R.id.action_upcoming){
-            updateMovie("upcoming");
+            updateMovie(getString(R.string.query_upcoming));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -92,7 +92,7 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onStart(){
         super.onStart();
-        updateMovie("popular");
+        updateMovie(getString(R.string.query_popular));
     }
 
     @Override
@@ -109,7 +109,7 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 AndroidMovie movieData = mMovieAdapter.getItem(position);
-                Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra("movie_info",movieData);
+                Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra("movie_info", movieData);
                 startActivity(intent);
             }
         });
@@ -137,9 +137,6 @@ public class MainActivityFragment extends Fragment {
             String movieJsonStr = null;
 
             try {
-                // Construct the URL for the OpenWeatherMap query
-                // Possible parameters are avaiable at OWM's forecast API page, at
-                // http://openweathermap.org/API#forecast
                 String baseUrl = "http://api.themoviedb.org/3/movie/";
                 String apiKey = "?api_key=" + BuildConfig.OPEN_MOVIE_API_KEY;
                 URL url = new URL(baseUrl.concat(sortMode[0]).concat(apiKey));
