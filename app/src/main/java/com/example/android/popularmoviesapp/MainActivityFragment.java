@@ -81,6 +81,9 @@ public class MainActivityFragment extends Fragment {
             updateMovie(getString(R.string.query_upcoming));
             return true;
         }
+        if (id == R.id.action_settings) {
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -92,7 +95,6 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onStart(){
         super.onStart();
-        updateMovie(getString(R.string.query_popular));
     }
 
     @Override
@@ -113,6 +115,7 @@ public class MainActivityFragment extends Fragment {
                 startActivity(intent);
             }
         });
+        updateMovie(getString(R.string.query_popular));
         return rootView;
 
     }
