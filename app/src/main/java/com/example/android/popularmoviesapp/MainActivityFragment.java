@@ -212,6 +212,7 @@ public class MainActivityFragment extends Fragment {
 
         final String OWM_LIST = "results";
         final String OWM_PATH = "poster_path";
+        final String OWM_ID = "id";
         final String OWM_TITLE = "title";
         final String OWM_OVERVIEW = "overview";
         final String OWM_RATING = "vote_average";
@@ -227,10 +228,11 @@ public class MainActivityFragment extends Fragment {
             JSONObject movieInfo = movieArray.getJSONObject(i);
             String posterPath = BASE_PATH + movieInfo.getString(OWM_PATH);
             String title = movieInfo.getString(OWM_TITLE);
+            String id = movieInfo.getString(OWM_ID);
             String overview = movieInfo.getString(OWM_OVERVIEW);
             String rating = movieInfo.getString(OWM_RATING);
             String release_date = movieInfo.getString(OWM_RELEASE);
-            movie[i] = new AndroidMovie(title, posterPath, overview, rating, release_date);
+            movie[i] = new AndroidMovie(id, title, posterPath, overview, rating, release_date);
         }
 
         return movie;

@@ -33,11 +33,11 @@ public class DetailActivityFragment extends Fragment {
             Picasso
                     .with(getActivity())
                     .load(obj.getPosterPath())
-                    .fit() // will explain later
                     .into(postView);
+            String[] dateSplite = obj.getRelease_date().split("-");
             ((TextView) rootView.findViewById(R.id.movie_overview)).setText(obj.getOverview());
-            ((TextView) rootView.findViewById(R.id.movie_rating)).setText("RATING: " + obj.getRating());
-            ((TextView) rootView.findViewById(R.id.movie_release_date)).setText("RELEASE DATE: " + obj.getRelease_date());
+            ((TextView) rootView.findViewById(R.id.movie_rating)).setText(obj.getRating()+"/10");
+            ((TextView) rootView.findViewById(R.id.movie_release_date)).setText(dateSplite[0]);
         }
         return rootView;
     }

@@ -8,13 +8,15 @@ import android.util.Log;
  * Created by poornima-udacity on 6/26/15.
  */
 public class AndroidMovie  implements Parcelable {
+    private String id;
     private String title;
     private String posterPath; // drawable reference id
     private String overview;
     private String rating;
     private String release_date;
 
-    public AndroidMovie (String title, String posterPath, String overview, String rating, String release_date) {
+    public AndroidMovie (String id, String title, String posterPath, String overview, String rating, String release_date) {
+        this.id = id;
         this.title = title;
         this.posterPath = posterPath;
         this.overview = overview;
@@ -33,6 +35,7 @@ public class AndroidMovie  implements Parcelable {
 
     public void writeToParcel (Parcel dest, int flags) {
         Log.d("TestParcel","writeToParcel()");
+        dest.writeString(id);
         dest.writeString(title);
         dest.writeString(posterPath);
         dest.writeString(overview);
@@ -42,6 +45,7 @@ public class AndroidMovie  implements Parcelable {
 
     private void readFromParcel (Parcel in) {
         Log.d("TestParcel","readFromParcel()");
+        id = in.readString();
         title = in.readString();
         posterPath = in.readString();
         overview = in.readString();
@@ -60,6 +64,9 @@ public class AndroidMovie  implements Parcelable {
         }
     };
 
+    public String getId() {
+        return id;
+    }
     public String getTitle() {
         return title;
     }
