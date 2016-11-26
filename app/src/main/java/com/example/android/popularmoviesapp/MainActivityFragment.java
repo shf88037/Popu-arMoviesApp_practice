@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,17 +13,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -120,122 +110,32 @@ public class MainActivityFragment extends Fragment {
 
     }
 
-    public class FetchMovieTask extends AsyncTask<String, Void, AndroidMovie[]> {
+    public class FetchMovieTask extends AsyncTask<String, Void, List<AndroidMovie>> {
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
         @Override
-        protected AndroidMovie[] doInBackground(String... sortMode) {
+        protected List<AndroidMovie> doInBackground(String... sortMode) {
 
             if (sortMode.length == 0) {
                 return null;
             }
 
-            // These two need to be declared outside the try/catch
-            // so that they can be closed in the finally block.
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            // Will contain the raw JSON response as a string.
-            String movieJsonStr = null;
-
-            try {
-                String baseUrl = "http://api.themoviedb.org/3/movie/";
-                String apiKey = "?api_key=" + BuildConfig.OPEN_MOVIE_API_KEY;
-                URL url = new URL(baseUrl.concat(sortMode[0]).concat(apiKey));
-
-                // Create the request to OpenWeatherMap, and open the connection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                // Read the input stream into a String
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return null;
-                }
-                movieJsonStr = buffer.toString();
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attemping
-                // to parse it.
-                return null;
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
-                    }
-                }
-            }
-            try {
-                return getMoviePictureFromJson(movieJsonStr);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
+            String baseUrl = "http://api.themoviedb.org/3/movie/";
+            String apiKey = "?api_key=" + BuildConfig.OPEN_MOVIE_API_KEY;
+            String stringUrl = baseUrl.concat(sortMode[0]).concat(apiKey);
+            List<AndroidMovie> result =  QueryUtils.fetchMovieData(stringUrl);
+            return result;
         }
 
         @Override
-        protected void onPostExecute(AndroidMovie[] result) {
+        protected void onPostExecute(List<AndroidMovie> result) {
             if (result != null) {
             mMovieAdapter.clear();
-            for (AndroidMovie movieInfo : result) {
-                mMovieAdapter.add(movieInfo);
-            }
-                }
+            mMovieAdapter.addAll(result);
             }
 
         }
-
-    private AndroidMovie[] getMoviePictureFromJson(String movieJsonStr) throws JSONException  {
-
-        final String OWM_LIST = "results";
-        final String OWM_PATH = "poster_path";
-        final String OWM_ID = "id";
-        final String OWM_TITLE = "title";
-        final String OWM_OVERVIEW = "overview";
-        final String OWM_RATING = "vote_average";
-        final String OWM_RELEASE = "release_date";
-
-        final String BASE_PATH = "http://image.tmdb.org/t/p/w185/";
-
-        JSONObject movieJson = new JSONObject(movieJsonStr);
-        JSONArray movieArray = movieJson.getJSONArray(OWM_LIST);
-        AndroidMovie[] movie = new AndroidMovie[movieArray.length()];
-
-        for(int i = 0; i < movieArray.length(); i++) {
-            JSONObject movieInfo = movieArray.getJSONObject(i);
-            String posterPath = BASE_PATH + movieInfo.getString(OWM_PATH);
-            String title = movieInfo.getString(OWM_TITLE);
-            String id = movieInfo.getString(OWM_ID);
-            String overview = movieInfo.getString(OWM_OVERVIEW);
-            String rating = movieInfo.getString(OWM_RATING);
-            String release_date = movieInfo.getString(OWM_RELEASE);
-            movie[i] = new AndroidMovie(id, title, posterPath, overview, rating, release_date);
-        }
-
-        return movie;
     }
 }
 
