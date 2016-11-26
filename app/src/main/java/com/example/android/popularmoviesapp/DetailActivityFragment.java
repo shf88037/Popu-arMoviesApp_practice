@@ -48,7 +48,7 @@ public class DetailActivityFragment extends Fragment {
         Intent intent = getActivity().getIntent();
 
         if (intent != null) {
-            AndroidMovie obj = intent.getParcelableExtra("movie_info");
+            Movie obj = intent.getParcelableExtra("movie_info");
             mTitle.setText(obj.getTitle());
 
             Picasso

@@ -12,8 +12,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class AndroidMovieAdapter extends ArrayAdapter<AndroidMovie> {
-    private static final String LOG_TAG = AndroidMovieAdapter.class.getSimpleName();
+public class MovieAdapter extends ArrayAdapter<Movie> {
+    private static final String LOG_TAG = MovieAdapter.class.getSimpleName();
     private Context context;
     /**
      * This is our own custom constructor (it doesn't mirror a superclass constructor).
@@ -21,14 +21,14 @@ public class AndroidMovieAdapter extends ArrayAdapter<AndroidMovie> {
      * to populate into the lists
      *
      * @param context        The current context. Used to inflate the layout file.
-     * @param androidMovies A List of AndroidMovie objects to display in a list
+     * @param movies A List of Movie objects to display in a list
      */
-    public AndroidMovieAdapter(Activity context, List<AndroidMovie> androidMovies) {
+    public MovieAdapter(Activity context, List<Movie> movies) {
         // Here, we initialize the ArrayAdapter's internal storage for the context and the list.
         // the second argument is used when the ArrayAdapter is populating a single TextView.
         // Because this is a custom adapter for two TextViews and an ImageView, the adapter is not
         // going to use this second argument, so it can be any value. Here, we used 0.
-        super(context, 0, androidMovies);
+        super(context, 0, movies);
         this.context = context;
     }
 
@@ -43,8 +43,8 @@ public class AndroidMovieAdapter extends ArrayAdapter<AndroidMovie> {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // Gets the AndroidMovie object from the ArrayAdapter at the appropriate position
-        AndroidMovie androidMovie = getItem(position);
+        // Gets the Movie object from the ArrayAdapter at the appropriate position
+        Movie movie = getItem(position);
 
         // Adapters recycle views to AdapterViews.
         // If this is a new View object we're getting, then inflate the layout.
@@ -57,7 +57,7 @@ public class AndroidMovieAdapter extends ArrayAdapter<AndroidMovie> {
         ImageView iconView = (ImageView) convertView.findViewById(R.id.list_item_icon);
         Picasso
                 .with(context)
-                .load(androidMovie.getPosterPath())
+                .load(movie.getPosterPath())
                 .into(iconView);
 
         return convertView;

@@ -11,4 +11,6 @@
     <string name="query_top_rated">top_rated</string>
     <string name="query_upcoming">upcoming</string>
     <string name="query_now_playing">now_playing</string>
+    <string name="no_internet_connection">No Internet connection.</string>
+    <string name="no_movie">No movies found.</string>
 </resources>

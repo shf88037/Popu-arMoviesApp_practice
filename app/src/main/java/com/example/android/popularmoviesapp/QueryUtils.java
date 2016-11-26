@@ -27,7 +27,7 @@ public final class QueryUtils {
 
     private QueryUtils() {}
 
-    public static List<AndroidMovie> fetchMovieData(String requestsUrl) {
+    public static List<Movie> fetchMovieData(String requestsUrl) {
 
         Log.i(LOG_TAG, "call fetchMovieDate. ");
 
@@ -40,7 +40,7 @@ public final class QueryUtils {
 
         jsonResponse = makeHttpRequest(url);
 
-        List<AndroidMovie> movies = null;
+        List<Movie> movies = null;
         try {
             movies = fetchMovieFromJson(jsonResponse);
         } catch (JSONException e) {
@@ -122,12 +122,12 @@ public final class QueryUtils {
     }
 
 
-    private static List<AndroidMovie> fetchMovieFromJson(String movieJSON) throws JSONException  {
+    private static List<Movie> fetchMovieFromJson(String movieJSON) throws JSONException  {
 
         if (TextUtils.isEmpty(movieJSON)) {
             return null;
         }
-        List<AndroidMovie> movies = new ArrayList<>();
+        List<Movie> movies = new ArrayList<>();
 
         final String OWM_LIST = "results";
         final String OWM_PATH = "poster_path";
@@ -150,7 +150,7 @@ public final class QueryUtils {
             String overview = movieInfo.getString(OWM_OVERVIEW);
             String rating = movieInfo.getString(OWM_RATING);
             String release_date = movieInfo.getString(OWM_RELEASE);
-            movies.add(new AndroidMovie(id, title, posterPath, overview, rating, release_date));
+            movies.add(new Movie(id, title, posterPath, overview, rating, release_date));
         }
 
         return movies;
