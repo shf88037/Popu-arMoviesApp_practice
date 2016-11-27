@@ -1,41 +1,109 @@
 package com.example.android.popularmoviesapp;
 
+import android.app.LoaderManager;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
+import android.content.Loader;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
-import com.squareup.picasso.Picasso;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class DetailActivityFragment extends Fragment {
 
-    private ImageView mPoster;
-    private TextView mTitle;
-    private TextView mOverview;
-    private TextView mReleaseYear;
-    private TextView mRating;
-    private TextView mLength;
+    private Intent receiveIntent;
+    private ListView mTrailerList;
+
+    private TrailerAdapter mTrailerAdapter;
+
+    private Movie receiveMovie;
+
+    private static final int MOVIE_RUNTIME_LOADER_ID = 1;
+    private static final int MOVIE_TRAILERS_LOADER_ID = 2;
+    private static final int MOVIE_OVERVIEW_LOADER_ID = 3;
+    private static final String LOG_TAG = DetailActivityFragment.class.getSimpleName();
+
+    private LoaderCallbacks<String> runtimeLoaderListener =
+            new LoaderCallbacks<String>() {
+                @Override
+                public Loader<String> onCreateLoader(int id, Bundle args) {
+                    if (receiveMovie != null) {
+                        return new MovieRuntimeLoader(getActivity(), receiveMovie.getId());
+                    }
+                    return null;
+                }
+
+                @Override
+                public void onLoadFinished(Loader<String> loader, String length) {
+                    if (!TextUtils.isEmpty(length)) {
+                        receiveMovie.setLength(length);
+                        mTrailerAdapter.clear();
+                        mTrailerAdapter.add(new Trailer("initial", "moveInfo"));
+                    }
+                }
+
+                @Override
+                public void onLoaderReset(Loader<String> loader) {
+                    mTrailerAdapter.clear();
+                }
+            };
+    private LoaderCallbacks<List<Trailer>> trailerLoaderListener
+            = new LoaderCallbacks<List<Trailer>>() {
+        @Override
+        public Loader<List<Trailer>> onCreateLoader(int id, Bundle args) {
+            if (receiveMovie != null) {
+                return new MovieTrailerLoader(getActivity(), receiveMovie.getId());
+            }
+            return null;
+        }
+
+        @Override
+        public void onLoadFinished(Loader<List<Trailer>> loader, List<Trailer> trailers) {
+            if (trailers != null && !trailers.isEmpty()) {
+                mTrailerAdapter.addAll(trailers);
+            }
+            Log.i(LOG_TAG, "mTrailerAdapter " + mTrailerAdapter.getCount());
+        }
+
+        @Override
+        public void onLoaderReset(Loader<List<Trailer>> loader) {
+                mTrailerAdapter.clear();
+        }
+    };
+    private LoaderCallbacks<String[]> reviewLoaderListener
+            = new LoaderCallbacks<String[]>() {
+        @Override
+        public Loader<String[]> onCreateLoader(int id, Bundle args) {
+            if (receiveMovie != null) {
+                return new MovieReviewLoader(getActivity(), receiveMovie.getId());
+            }
+            return null;
+        }
+
+        @Override
+        public void onLoadFinished(Loader<String[]> loader, String[] reviews) {
+            if (reviews != null && reviews.length != 0) {
+            }
+            Log.i(LOG_TAG, "mTrailerAdapter " + mTrailerAdapter.getCount());
+        }
+
+        @Override
+        public void onLoaderReset(Loader<String[]> loader) {
+
+        }
+    };
 
     public DetailActivityFragment() {
     }
@@ -45,137 +113,36 @@ public class DetailActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         setView(rootView);
-        Intent intent = getActivity().getIntent();
 
-        if (intent != null) {
-            Movie obj = intent.getParcelableExtra("movie_info");
-            mTitle.setText(obj.getTitle());
-
-            Picasso
-                    .with(getActivity())
-                    .load(obj.getPosterPath())
-                    .into(mPoster);
-            String[] dateSplite = obj.getRelease_date().split("-");
-            mOverview.setText(obj.getOverview());
-            mRating.setText(obj.getRating()+"/10");
-            mReleaseYear.setText(dateSplite[0]);
+        receiveIntent = getActivity().getIntent();
+        if (receiveIntent != null) {
+            receiveMovie = receiveIntent.getParcelableExtra("movie_info");
         }
+
+        LoaderManager loaderManager = getActivity().getLoaderManager();
+        loaderManager.initLoader(MOVIE_RUNTIME_LOADER_ID, null, runtimeLoaderListener);
+        loaderManager.initLoader(MOVIE_TRAILERS_LOADER_ID, null, trailerLoaderListener);
+
+        ArrayList<Trailer> trailers = new ArrayList<>();
+        mTrailerAdapter = new TrailerAdapter(getActivity(), trailers, receiveMovie);
+
+        mTrailerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String url = mTrailerAdapter.getItem(position).getmUrl();
+                if (position != 0) {
+                    Uri link = Uri.parse(url);
+                    Intent intent = new Intent(Intent.ACTION_VIEW, link);
+                    startActivity(intent);
+                }
+            }
+        });
+        mTrailerList.setAdapter(mTrailerAdapter);
+
         return rootView;
     }
 
-    private void setView (View rootView) {
-        mPoster = ((ImageView) rootView.findViewById(R.id.move_poster));
-        mTitle = ((TextView) rootView.findViewById(R.id.movie_title));
-        mOverview = ((TextView) rootView.findViewById(R.id.movie_overview));
-        mRating = ((TextView) rootView.findViewById(R.id.movie_rating));
-        mReleaseYear = ((TextView) rootView.findViewById(R.id.movie_release_date));
-        mLength = ((TextView) rootView.findViewById(R.id.movie_length));
-    }
-
-    private void queryMovieTrailer(String id) {
-    }
-
-    public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<String>> {
-
-        private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
-
-        @Override
-        protected ArrayList<String> doInBackground(String... id) {
-
-            if (id.length == 0) {
-                return null;
-            }
-
-            // These two need to be declared outside the try/catch
-            // so that they can be closed in the finally block.
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            // Will contain the raw JSON response as a string.
-            String movieJsonStr = null;
-
-            try {
-                String baseUrl = "https://api.themoviedb.org/3/movie/";
-                String targetMovie = id + "/video";
-                String apiKey = "?api_key=" + BuildConfig.OPEN_MOVIE_API_KEY;
-                URL url = new URL(baseUrl.concat(id[0]).concat(targetMovie).concat(apiKey));
-
-                // Create the request to OpenWeatherMap, and open the connection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                // Read the input stream into a String
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return null;
-                }
-                movieJsonStr = buffer.toString();
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attemping
-                // to parse it.
-                return null;
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
-                    }
-                }
-            }
-            try {
-                return getMovieTrailerUrlFromJson(movieJsonStr);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<String> result) {
-
-        }
-
-    }
-
-    private ArrayList<String> getMovieTrailerUrlFromJson(String movieJsonStr) throws JSONException  {
-
-        final String MOVIE_TRAILER_LIST = "results";
-        final String MOVIE_TRAILER_KEY = "key";
-
-        final String BASE_PATH = "https://www.youtube.com/watch?v=";
-
-        JSONObject movieJson = new JSONObject(movieJsonStr);
-        JSONArray movieArray = movieJson.getJSONArray(MOVIE_TRAILER_LIST);
-        ArrayList<String> movieTrailerUrls = new ArrayList<>();
-
-        for(int i = 0; i < movieArray.length(); i++) {
-            JSONObject movieInfo = movieArray.getJSONObject(i);
-            String movieTrailerUrl = BASE_PATH + movieInfo.getString(MOVIE_TRAILER_KEY);
-            movieTrailerUrls.add(movieTrailerUrl);
-        }
-
-        return movieTrailerUrls;
+    private void setView(View rootView) {
+        mTrailerList = (ListView) rootView.findViewById(R.id.trailers_list);
     }
 }

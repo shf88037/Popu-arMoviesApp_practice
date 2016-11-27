@@ -27,6 +27,108 @@ public final class QueryUtils {
 
     private QueryUtils() {}
 
+    public static List<Trailer> fetchMovieTrailers(String requestsUrl){
+        String jsonResponse = null;
+
+        URL url = createUrl(requestsUrl);
+
+        jsonResponse = makeHttpRequest(url);
+
+        List<Trailer> trailers = null;
+        try {
+            trailers = fetchMovieTrailersFromJson(jsonResponse);
+        } catch (JSONException e) {
+            Log.e("QueryUtils", "Problem parsing the movie JSON results", e);
+        }
+        return trailers;
+    }
+
+    private static List<Trailer> fetchMovieTrailersFromJson(String movieJSON) throws JSONException {
+
+        final String OWM_LIST= "results";
+        final String OWN_VIDEO_KEY = "key";
+
+        final String BASE_PATH = "https://www.youtube.com/watch?v=";
+        if (TextUtils.isEmpty(movieJSON)) {
+            return null;
+        }
+
+        JSONObject movieJson = new JSONObject(movieJSON);
+        JSONArray videoArray = movieJson.getJSONArray(OWM_LIST);
+        List<Trailer> trailers = new ArrayList<>();
+        for(int i = 0; i < videoArray.length(); i++) {
+            JSONObject videos = videoArray.getJSONObject(i);
+            String trailer = BASE_PATH + videos.getString(OWN_VIDEO_KEY);
+            String trailerName = "Trailer " + Integer.toString(i + 1);
+            trailers.add(new Trailer(trailerName, trailer));
+        }
+
+        return trailers;
+    }
+
+    public static String[] fetchMovieReview(String requestsUrl) {
+        String jsonResponse = null;
+
+        URL url = createUrl(requestsUrl);
+
+        jsonResponse = makeHttpRequest(url);
+
+        String[] review = new String[0];
+        try {
+            review = fetchMovieReviewFromJson(jsonResponse);
+        } catch (JSONException e) {
+            Log.e("QueryUtils", "Problem parsing the movie JSON results", e);
+        }
+
+        return review;
+    }
+
+    private static String[] fetchMovieReviewFromJson(String movieJSON) throws JSONException {
+
+        final String OWM_LIST= "results";
+        final String OWN_CONTENT = "content";
+
+        if (TextUtils.isEmpty(movieJSON)) {
+            return null;
+        }
+
+        JSONObject movieJson = new JSONObject(movieJSON);
+        JSONArray reviewsArray = movieJson.getJSONArray(OWM_LIST);
+        String[] contents = new String[reviewsArray.length()];
+        for(int i = 0; i < reviewsArray.length(); i++) {
+            JSONObject reviews = reviewsArray.getJSONObject(i);
+            String review = reviews.getString(OWN_CONTENT);
+            contents[i] = review;
+        }
+        return contents;
+    }
+
+    public static int fetchMovieRunTime(String requestsUrl) {
+        String jsonResponse = null;
+
+        URL url = createUrl(requestsUrl);
+
+        jsonResponse = makeHttpRequest(url);
+
+        int runtime = 0;
+        try {
+            runtime = fetchMovieRuntimeFromJson(jsonResponse);
+        } catch (JSONException e) {
+            Log.e("QueryUtils", "Problem parsing the movie JSON results", e);
+        }
+
+        return runtime;
+
+    }
+
+    private static int fetchMovieRuntimeFromJson(String movieJSON) throws JSONException {
+        int runtime = 120;
+        final String OWM_runtime = "runtime";
+            JSONObject movieJson = new JSONObject(movieJSON);
+            runtime = movieJson.getInt(OWM_runtime);
+        return runtime;
+    }
+
     public static List<Movie> fetchMovieData(String requestsUrl) {
 
         Log.i(LOG_TAG, "call fetchMovieDate. ");
@@ -48,8 +150,6 @@ public final class QueryUtils {
         }
 
         return movies;
-
-
 
     }
 

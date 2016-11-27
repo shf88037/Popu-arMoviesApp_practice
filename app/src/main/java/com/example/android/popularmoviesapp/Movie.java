@@ -14,6 +14,7 @@ public class Movie implements Parcelable {
     private String overview;
     private String rating;
     private String release_date;
+    private String length;
 
     public Movie(String id, String title, String posterPath, String overview, String rating, String release_date) {
         this.id = id;
@@ -22,6 +23,7 @@ public class Movie implements Parcelable {
         this.overview = overview;
         this.rating = rating;
         this.release_date = release_date;
+        this.length = null;
     }
     public Movie(Parcel in) {
         Log.d("TestParcel","SourceObject(Parcel in)");
@@ -82,5 +84,7 @@ public class Movie implements Parcelable {
     public String getRelease_date() {
         return release_date;
     }
+    public String getLength() {return length;}
+    public void setLength(String length) {this.length = length;}
 
 }
