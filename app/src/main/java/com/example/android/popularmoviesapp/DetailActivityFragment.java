@@ -13,7 +13,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +29,15 @@ public class DetailActivityFragment extends Fragment {
 
     private Intent receiveIntent;
     private ListView mTrailerList;
-
     private TrailerAdapter mTrailerAdapter;
-
     private Movie receiveMovie;
+    private View header;
+    private ImageView mPoster;
+    private TextView mTitle;
+    private TextView mOverview;
+    private TextView mRating;
+    private TextView mReleaseYear;
+    private TextView mLength;
 
     private static final int MOVIE_RUNTIME_LOADER_ID = 1;
     private static final int MOVIE_TRAILERS_LOADER_ID = 2;
@@ -49,8 +58,7 @@ public class DetailActivityFragment extends Fragment {
                 public void onLoadFinished(Loader<String> loader, String length) {
                     if (!TextUtils.isEmpty(length)) {
                         receiveMovie.setLength(length);
-                        mTrailerAdapter.clear();
-                        mTrailerAdapter.add(new Trailer("initial", "moveInfo"));
+                        mLength.setText(receiveMovie.getLength());
                     }
                 }
 
@@ -72,6 +80,7 @@ public class DetailActivityFragment extends Fragment {
         @Override
         public void onLoadFinished(Loader<List<Trailer>> loader, List<Trailer> trailers) {
             if (trailers != null && !trailers.isEmpty()) {
+                mTrailerAdapter.clear();
                 mTrailerAdapter.addAll(trailers);
             }
             Log.i(LOG_TAG, "mTrailerAdapter " + mTrailerAdapter.getCount());
@@ -123,6 +132,9 @@ public class DetailActivityFragment extends Fragment {
         loaderManager.initLoader(MOVIE_RUNTIME_LOADER_ID, null, runtimeLoaderListener);
         loaderManager.initLoader(MOVIE_TRAILERS_LOADER_ID, null, trailerLoaderListener);
 
+        header = inflater.inflate(R.layout.list_item_movie_info, container, false);
+        setHeader(header, receiveMovie);
+
         ArrayList<Trailer> trailers = new ArrayList<>();
         mTrailerAdapter = new TrailerAdapter(getActivity(), trailers, receiveMovie);
 
@@ -137,6 +149,7 @@ public class DetailActivityFragment extends Fragment {
                 }
             }
         });
+        mTrailerList.addHeaderView(header, null, false);
         mTrailerList.setAdapter(mTrailerAdapter);
 
         return rootView;
@@ -144,5 +157,25 @@ public class DetailActivityFragment extends Fragment {
 
     private void setView(View rootView) {
         mTrailerList = (ListView) rootView.findViewById(R.id.trailers_list);
+    }
+
+    private void setHeader(View header, Movie receiveMovie) {
+        mPoster = ((ImageView) header.findViewById(R.id.move_poster));
+        mTitle = ((TextView) header.findViewById(R.id.movie_title));
+        mOverview = ((TextView) header.findViewById(R.id.movie_overview));
+        mRating = ((TextView) header.findViewById(R.id.movie_rating));
+        mReleaseYear = ((TextView) header.findViewById(R.id.movie_release_date));
+        mLength = ((TextView) header.findViewById(R.id.movie_length));
+        mTitle.setText(receiveMovie.getTitle());
+        Glide
+                .with(getContext())
+                .load(receiveMovie.getPosterPath())
+                .into(mPoster);
+
+        String[] dateSplite = receiveMovie.getRelease_date().split("-");
+        mOverview.setText(receiveMovie.getOverview());
+        mRating.setText(receiveMovie.getRating() + "/10");
+        mReleaseYear.setText(dateSplite[0]);
+        mLength.setText(receiveMovie.getLength());
     }
 }
