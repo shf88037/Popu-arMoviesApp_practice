@@ -10,11 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class TrailerAdapter extends ArrayAdapter<Trailer> {
-    private static final int View_TYPE_INFO = 0;
-    private static final int View_TYPE_TRAILER = 1;
     private static final String LOG_TAG = TrailerAdapter.class.getSimpleName();
-    private Context context;
-    private Movie movie;
 
     /**
      * This is our own custom constructor (it doesn't mirror a superclass constructor).
@@ -24,14 +20,12 @@ public class TrailerAdapter extends ArrayAdapter<Trailer> {
      * @param context  The current context. Used to inflate the layout file.
      * @param trailers A List of Movie objects to display in a list
      */
-    public TrailerAdapter(Context context, ArrayList<Trailer> trailers, Movie movie) {
+    public TrailerAdapter(Context context, ArrayList<Trailer> trailers) {
         // Here, we initialize the ArrayAdapter's internal storage for the context and the list.
         // the second argument is used when the ArrayAdapter is populating a single TextView.
         // Because this is a custom adapter for two TextViews and an ImageView, the adapter is not
         // going to use this second argument, so it can be any value. Here, we used 0.
         super(context, 0, trailers);
-        this.context = context;
-        this.movie = movie;
     }
 
     /**

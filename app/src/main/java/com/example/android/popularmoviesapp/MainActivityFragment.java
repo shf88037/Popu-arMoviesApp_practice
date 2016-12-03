@@ -59,11 +59,23 @@ public class MainActivityFragment extends Fragment implements LoaderCallbacks<Li
     }
 
 
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+       // if (savedInstanceState == null || !savedInstanceState.containsKey("movies")) {
+       //     dataSet = new ArrayList<>();
+       // } else {
+       //     dataSet = savedInstanceState.getParcelableArrayList("movies");
+       // }
     }
+
+    /*@Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("movies", (ArrayList<? extends Parcelable>) dataSet);
+        super.onSaveInstanceState(outState);
+    }*/
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -72,40 +84,37 @@ public class MainActivityFragment extends Fragment implements LoaderCallbacks<Li
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_popular){
-            //updateMovie(getString(R.string.query_popular));
-            nowQuery = getString(R.string.query_popular);
-            mMovieLoader = new MovieLoader(getActivity(), nowQuery, 1);
-            loaderManager.restartLoader(MOVIE_LOADER_ID, null, this);
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_popular:
+                nowQuery = getString(R.string.query_popular);
+                mMovieLoader = new MovieLoader(getActivity(), nowQuery, 1);
+                loaderManager.restartLoader(MOVIE_LOADER_ID, null, this);
+                item.setChecked(!item.isChecked());
+                return true;
+            case R.id.action_top_rated:
+                nowQuery = getString(R.string.query_top_rated);
+                mMovieLoader = new MovieLoader(getActivity(), nowQuery, 1);
+                loaderManager.restartLoader(MOVIE_LOADER_ID, null, this);
+                item.setChecked(!item.isChecked());
+                return true;
+            case R.id.action_now_playing:
+                nowQuery =  getString(R.string.query_now_playing);
+                mMovieLoader = new MovieLoader(getActivity(), nowQuery, 1);
+                loaderManager.restartLoader(MOVIE_LOADER_ID, null, this);
+                item.setChecked(!item.isChecked());
+                return true;
+            case R.id.action_upcoming:
+                nowQuery =  getString(R.string.query_upcoming);
+                mMovieLoader = new MovieLoader(getActivity(), nowQuery, 1);
+                loaderManager.restartLoader(MOVIE_LOADER_ID, null, this);
+                item.setChecked(!item.isChecked());
+                return true;
+            case R.id.action_favorite:
+                item.setChecked(!item.isChecked());
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        if (id == R.id.action_top_rated){
-            //updateMovie(getString(R.string.query_top_rated));
-            nowQuery = getString(R.string.query_top_rated);
-            mMovieLoader = new MovieLoader(getActivity(), nowQuery, 1);
-            loaderManager.restartLoader(MOVIE_LOADER_ID, null, this);
-            return true;
-        }
-        if (id == R.id.action_now_playing){
-            //updateMovie(getString(R.string.query_now_playing));
-            nowQuery =  getString(R.string.query_now_playing);
-            mMovieLoader = new MovieLoader(getActivity(), nowQuery, 1);
-            loaderManager.restartLoader(MOVIE_LOADER_ID, null, this);
-            return true;
-        }
-        if (id == R.id.action_upcoming){
-            //updateMovie(getString(R.string.query_upcoming));
-            nowQuery =  getString(R.string.query_upcoming);
-            mMovieLoader = new MovieLoader(getActivity(), nowQuery, 1);
-            loaderManager.restartLoader(MOVIE_LOADER_ID, null, this);
-            return true;
-        }
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     //private void updateMovie(String sort) {

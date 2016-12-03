@@ -105,7 +105,7 @@ public class DetailActivityFragment extends Fragment {
         public void onLoadFinished(Loader<String[]> loader, String[] reviews) {
             if (reviews != null && reviews.length != 0) {
             }
-            Log.i(LOG_TAG, "mTrailerAdapter " + mTrailerAdapter.getCount());
+
         }
 
         @Override
@@ -136,7 +136,7 @@ public class DetailActivityFragment extends Fragment {
         setHeader(header, receiveMovie);
 
         ArrayList<Trailer> trailers = new ArrayList<>();
-        mTrailerAdapter = new TrailerAdapter(getActivity(), trailers, receiveMovie);
+        mTrailerAdapter = new TrailerAdapter(getActivity(), trailers);
 
         mTrailerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
