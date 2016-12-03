@@ -48,7 +48,8 @@ public final class QueryUtils {
         final String OWM_LIST= "results";
         final String OWN_VIDEO_KEY = "key";
 
-        final String BASE_PATH = "https://www.youtube.com/watch?v=";
+        final String TRAILER_BASE_PATH = "https://www.youtube.com/watch?v=";
+        final String TRAILER_ICON_BASE_PATH = "http://img.youtube.com/vi/";
         if (TextUtils.isEmpty(movieJSON)) {
             return null;
         }
@@ -58,9 +59,10 @@ public final class QueryUtils {
         List<Trailer> trailers = new ArrayList<>();
         for(int i = 0; i < videoArray.length(); i++) {
             JSONObject videos = videoArray.getJSONObject(i);
-            String trailer = BASE_PATH + videos.getString(OWN_VIDEO_KEY);
-            String trailerName = "Trailer " + Integer.toString(i + 1);
-            trailers.add(new Trailer(trailerName, trailer));
+            String trailerIconUrl = TRAILER_ICON_BASE_PATH + videos.getString(OWN_VIDEO_KEY) + "/0.jpg";
+            Log.i(LOG_TAG, "icon url:" + trailerIconUrl);
+            String trailerUrl = TRAILER_BASE_PATH + videos.getString(OWN_VIDEO_KEY);
+            trailers.add(new Trailer(trailerIconUrl, trailerUrl));
         }
 
         return trailers;
@@ -230,7 +232,8 @@ public final class QueryUtils {
         List<Movie> movies = new ArrayList<>();
 
         final String OWM_LIST = "results";
-        final String OWM_PATH = "poster_path";
+        final String OWM_POSTER_PATH = "poster_path";
+        final String OWM_BACKDROP_PATH = "backdrop_path";
         final String OWM_ID = "id";
         final String OWM_TITLE = "title";
         final String OWM_OVERVIEW = "overview";
@@ -244,13 +247,14 @@ public final class QueryUtils {
 
         for(int i = 0; i < movieArray.length(); i++) {
             JSONObject movieInfo = movieArray.getJSONObject(i);
-            String posterPath = BASE_PATH + movieInfo.getString(OWM_PATH);
+            String posterPath = BASE_PATH + movieInfo.getString(OWM_POSTER_PATH);
+            String backdropPath = BASE_PATH + movieInfo.getString(OWM_BACKDROP_PATH);
             String title = movieInfo.getString(OWM_TITLE);
             String id = movieInfo.getString(OWM_ID);
             String overview = movieInfo.getString(OWM_OVERVIEW);
             String rating = movieInfo.getString(OWM_RATING);
             String release_date = movieInfo.getString(OWM_RELEASE);
-            movies.add(new Movie(id, title, posterPath, overview, rating, release_date));
+            movies.add(new Movie(id, title, posterPath, backdropPath, overview, rating, release_date));
         }
 
         return movies;

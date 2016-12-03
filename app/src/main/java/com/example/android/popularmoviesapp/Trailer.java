@@ -5,17 +5,17 @@ package com.example.android.popularmoviesapp;
  */
 
 public class Trailer {
-    private String mTitle;
-    private String mUrl;
-    public Trailer(String title, String url) {
-        mTitle = title;
-        mUrl = url;
+    private String mIconUrl;
+    private String mTrailerUrl;
+    public Trailer(String iconUrl, String trailerUrl) {
+        mIconUrl = iconUrl;
+        mTrailerUrl = trailerUrl;
     }
 
-    public String getmUrl() {
-        return mUrl;
+    public String getTrailerUrl() {
+        return mTrailerUrl;
     }
-    public String getmTitle() {
-        return mTitle;
+    public String getIconUrl() {
+        return mIconUrl;
     }
 }
