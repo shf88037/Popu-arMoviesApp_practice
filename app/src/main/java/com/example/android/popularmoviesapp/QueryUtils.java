@@ -68,14 +68,14 @@ public final class QueryUtils {
         return trailers;
     }
 
-    public static String[] fetchMovieReview(String requestsUrl) {
+    public static List<Review> fetchMovieReview(String requestsUrl) {
         String jsonResponse = null;
 
         URL url = createUrl(requestsUrl);
 
         jsonResponse = makeHttpRequest(url);
 
-        String[] review = new String[0];
+        List<Review> review = new ArrayList<>();
         try {
             review = fetchMovieReviewFromJson(jsonResponse);
         } catch (JSONException e) {
@@ -85,9 +85,10 @@ public final class QueryUtils {
         return review;
     }
 
-    private static String[] fetchMovieReviewFromJson(String movieJSON) throws JSONException {
+    private static List<Review> fetchMovieReviewFromJson(String movieJSON) throws JSONException {
 
         final String OWM_LIST= "results";
+        final String OWN_AUTHOR = "author";
         final String OWN_CONTENT = "content";
 
         if (TextUtils.isEmpty(movieJSON)) {
@@ -96,11 +97,12 @@ public final class QueryUtils {
 
         JSONObject movieJson = new JSONObject(movieJSON);
         JSONArray reviewsArray = movieJson.getJSONArray(OWM_LIST);
-        String[] contents = new String[reviewsArray.length()];
+        List<Review> contents = new ArrayList<>();
         for(int i = 0; i < reviewsArray.length(); i++) {
             JSONObject reviews = reviewsArray.getJSONObject(i);
+            String author = reviews.getString(OWN_AUTHOR);
             String review = reviews.getString(OWN_CONTENT);
-            contents[i] = review;
+            contents.add(new Review(author, review));
         }
         return contents;
     }
@@ -240,15 +242,16 @@ public final class QueryUtils {
         final String OWM_RATING = "vote_average";
         final String OWM_RELEASE = "release_date";
 
-        final String BASE_PATH = "http://image.tmdb.org/t/p/w185/";
+        final String BASE_POSTER_PATH = "http://image.tmdb.org/t/p/w185/";
+        final String BASE_BACKDROP_PATH = "http://image.tmdb.org/t/p/w780/";
 
         JSONObject movieJson = new JSONObject(movieJSON);
         JSONArray movieArray = movieJson.getJSONArray(OWM_LIST);
 
         for(int i = 0; i < movieArray.length(); i++) {
             JSONObject movieInfo = movieArray.getJSONObject(i);
-            String posterPath = BASE_PATH + movieInfo.getString(OWM_POSTER_PATH);
-            String backdropPath = BASE_PATH + movieInfo.getString(OWM_BACKDROP_PATH);
+            String posterPath = BASE_POSTER_PATH + movieInfo.getString(OWM_POSTER_PATH);
+            String backdropPath = BASE_BACKDROP_PATH + movieInfo.getString(OWM_BACKDROP_PATH);
             String title = movieInfo.getString(OWM_TITLE);
             String id = movieInfo.getString(OWM_ID);
             String overview = movieInfo.getString(OWM_OVERVIEW);

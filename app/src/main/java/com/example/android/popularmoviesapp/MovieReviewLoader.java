@@ -4,10 +4,12 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.util.Log;
 
+import java.util.List;
+
 /**
  * Created by note_TM on 2016/11/27.
  */
-public class MovieReviewLoader extends AsyncTaskLoader<String[]> {
+public class MovieReviewLoader extends AsyncTaskLoader<List<Review>> {
 
     private static final String LOG_TAG = MovieRuntimeLoader.class.getSimpleName();
     private String movieId;
@@ -24,13 +26,13 @@ public class MovieReviewLoader extends AsyncTaskLoader<String[]> {
     }
 
     @Override
-    public String[] loadInBackground() {
+    public List<Review> loadInBackground() {
 
         String baseUrl = "http://api.themoviedb.org/3/movie/";
         String review = "/reviews";
         String apiKey = "?api_key=" + BuildConfig.OPEN_MOVIE_API_KEY;
         final String stringUrl = baseUrl.concat(movieId).concat(review).concat(apiKey);
-        String[] result = QueryUtils.fetchMovieReview(stringUrl);
+        List<Review> result = QueryUtils.fetchMovieReview(stringUrl);
         return result;
     }
 }

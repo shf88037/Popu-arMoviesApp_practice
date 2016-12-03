@@ -39,6 +39,7 @@ public class DetailActivity extends AppCompatActivity {
         Glide
                 .with(this)
                 .load(receiveMovie.getBackdropPath())
+                .centerCrop()
                 .into(titleImage);
 
         CollapsingToolbarLayout collapsingToolbar =
@@ -59,6 +60,7 @@ public class DetailActivity extends AppCompatActivity {
         PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new DetailActivityFragment(), "Home");
         adapter.addFragment(new TrailerListFragment(), "Trailers");
+        adapter.addFragment(new ReviewListFragment(), "Reviews");
         viewPager.setAdapter(adapter);
     }
 

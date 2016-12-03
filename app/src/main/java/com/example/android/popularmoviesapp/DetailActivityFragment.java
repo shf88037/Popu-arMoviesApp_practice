@@ -56,29 +56,6 @@ public class DetailActivityFragment extends Fragment {
                 }
             };
 
-    private LoaderCallbacks<String[]> reviewLoaderListener
-            = new LoaderCallbacks<String[]>() {
-        @Override
-        public Loader<String[]> onCreateLoader(int id, Bundle args) {
-            if (receiveMovie != null) {
-                return new MovieReviewLoader(getActivity(), receiveMovie.getId());
-            }
-            return null;
-        }
-
-        @Override
-        public void onLoadFinished(Loader<String[]> loader, String[] reviews) {
-            if (reviews != null && reviews.length != 0) {
-            }
-
-        }
-
-        @Override
-        public void onLoaderReset(Loader<String[]> loader) {
-
-        }
-    };
-
     public DetailActivityFragment() {
     }
 
