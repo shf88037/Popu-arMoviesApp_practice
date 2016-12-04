@@ -12,14 +12,16 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     private final static int DATABASE_VERSION = 1;
     private final static String DATABASE_NAME = "movie.db";
     private final static String SQL_CREATE_MOVIES_TABLE = "CREATE TABLE "
-            + MovieContract.MovieEntry.TABLE_NAME + " ("
+            + MovieContract.MovieEntry.TABLE_NAME + "("
             + MovieContract.MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + MovieContract.MovieEntry.COLUMN_MOVIE_ID + " TEXT NOT NULL, "
             + MovieContract.MovieEntry.COLUMN_TITLE + " TEXT NOT NULL, "
             + MovieContract.MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, "
-            + MovieContract.MovieEntry.COLUMN_OVERVIEW + " TEXT, "
-            + MovieContract.MovieEntry.COLUMN_RATING + " TEXT, "
-            + MovieContract.MovieEntry.COLUMN_RELEASE_DATE + " TEXT);";
+            + MovieContract.MovieEntry.COLUMN_BACKDROP_PATH + " TEXT NOT NULL, "
+            + MovieContract.MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, "
+            + MovieContract.MovieEntry.COLUMN_RATING + " TEXT NOT NULL, "
+            + MovieContract.MovieEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, "
+            + MovieContract.MovieEntry.COLUMN_LENGTH + " TEXT);";
 
     private final static String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
             + MovieContract.MovieEntry.TABLE_NAME;

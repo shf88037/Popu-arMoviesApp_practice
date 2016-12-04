@@ -60,7 +60,6 @@ public final class QueryUtils {
         for(int i = 0; i < videoArray.length(); i++) {
             JSONObject videos = videoArray.getJSONObject(i);
             String trailerIconUrl = TRAILER_ICON_BASE_PATH + videos.getString(OWN_VIDEO_KEY) + "/0.jpg";
-            Log.i(LOG_TAG, "icon url:" + trailerIconUrl);
             String trailerUrl = TRAILER_BASE_PATH + videos.getString(OWN_VIDEO_KEY);
             trailers.add(new Trailer(trailerIconUrl, trailerUrl));
         }

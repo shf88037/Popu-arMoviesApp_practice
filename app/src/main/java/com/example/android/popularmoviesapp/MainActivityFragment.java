@@ -5,12 +5,14 @@ import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
 import android.content.Loader;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,6 +21,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.TextView;
+
+import com.example.android.popularmoviesapp.data.MovieContract;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +33,7 @@ import java.util.List;
 
 public class MainActivityFragment extends Fragment implements LoaderCallbacks<List<Movie>> {
 
-    private static final String LOG_TAG = "test";
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private static final int MOVIE_LOADER_ID = 1;
     private String nowQuery;
@@ -40,24 +44,10 @@ public class MainActivityFragment extends Fragment implements LoaderCallbacks<Li
     private MovieLoader mMovieLoader;
     private LoaderManager loaderManager;
     private List<Movie> dataSet;
-    private EndlessRecyclerViewScrollListener srollListener;
-
-    /*Movie[] default_movie = {
-            new Movie("Honeycomb", "3.0-3.2.6", "http://image.tmdb.org/t/p/w185//weUSwMdQIa3NaXVzwUoIIcAi85d.jpg"),
-            new Movie("Ice Cream Sandwich", "4.0-4.0.4", "http://image.tmdb.org/t/p/w185//m4ZfuML89Rq8gbRGdm9ncSibjlx.jpg"),
-            new Movie("Jelly Bean", "4.1-4.3.1", "http://image.tmdb.org/t/p/w185//uPqAW07bGoljf3cmT5gecdOvVol.jpg"),
-            new Movie("KitKat", "4.4-4.4.4", "http://image.tmdb.org/t/p/w185//5vfRMplGxOzMiJu0FGFCA1ic44Q.jpg"),
-            new Movie("Lollipop", "5.0-5.1.1", "http://image.tmdb.org/t/p/w185//s7OVVDszWUw79clca0durAIa6mw.jpg"),
-            new Movie("Cupcake", "1.5", "http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg"),
-            new Movie("Donut", "1.6", "http://image.tmdb.org/t/p/w185//sM33SANp9z6rXW8Itn7NnG1GOEs.jpg"),
-            new Movie("Eclair", "2.0-2.1", "http://image.tmdb.org/t/p/w185//inVq3FRqcYIRl2la8iZikYYxFNR.jpg"),
-            new Movie("Froyo", "2.2-2.2.3", "http://image.tmdb.org/t/p/w185//pYzHflb8QgQszkR4Ku8mWrJAYfA.jpg"),
-            new Movie("GingerBread", "2.3-2.3.7", "http://image.tmdb.org/t/p/w185//zSouWWrySXshPCT4t3UKCQGayyo.jpg"),
-    };*/
+    private EndlessRecyclerViewScrollListener scrollListener;
 
     public MainActivityFragment() {
     }
-
 
 
     @Override
@@ -110,6 +100,8 @@ public class MainActivityFragment extends Fragment implements LoaderCallbacks<Li
                 item.setChecked(!item.isChecked());
                 return true;
             case R.id.action_favorite:
+                nowQuery = getString(R.string.action_favorite);
+                loadMyFavoriteMovies();
                 item.setChecked(!item.isChecked());
                 return true;
             default:
@@ -117,13 +109,61 @@ public class MainActivityFragment extends Fragment implements LoaderCallbacks<Li
         }
     }
 
-    //private void updateMovie(String sort) {
-    //    MovieLoader weatherLoader = new MovieLoader(getActivity(), sort);
-    //}
+    private void loadMyFavoriteMovies() {
+        String[] projections = {
+                MovieContract.MovieEntry._ID,
+                MovieContract.MovieEntry.COLUMN_MOVIE_ID,
+                MovieContract.MovieEntry.COLUMN_TITLE,
+                MovieContract.MovieEntry.COLUMN_POSTER_PATH,
+                MovieContract.MovieEntry.COLUMN_BACKDROP_PATH,
+                MovieContract.MovieEntry.COLUMN_OVERVIEW,
+                MovieContract.MovieEntry.COLUMN_RATING,
+                MovieContract.MovieEntry.COLUMN_RELEASE_DATE
+        };
+        Cursor cursor = getActivity().getContentResolver().query(
+                                        MovieContract.MovieEntry.CONTENT_URI,
+                                        projections,
+                                        null,
+                                        null,
+                                        null);
+        if (cursor.moveToFirst()) {
+            dataSet.clear();
+            while (cursor.moveToNext()) {
+                int columnIdIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID);
+                int columnTitleIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE);
+                int columnPosterPathIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER_PATH);
+                int columnBackdropPathIdIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_BACKDROP_PATH);
+                int columnOverviewIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_OVERVIEW);
+                int columnRatingIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RATING);
+                int columnReleaseDateIndex = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RELEASE_DATE);
+                String id = cursor.getString(columnIdIndex);
+                String title = cursor.getString(columnTitleIndex);
+                String posterPath = cursor.getString(columnPosterPathIndex);
+                String backdropPath = cursor.getString(columnBackdropPathIdIndex);
+                String overview = cursor.getString(columnOverviewIndex);
+                String rating = cursor.getString(columnRatingIndex);
+                String date = cursor.getString(columnReleaseDateIndex);
+                dataSet.add(new Movie(id, title, posterPath, backdropPath, overview, rating, date));
+                Log.i(LOG_TAG, "Add cursor:" + title);
+                //Toast.makeText(getContext(), "query movie successfully:" + title, Toast.LENGTH_SHORT).show();
+            }
+            mMovieRecyclerViewAdapter.notifyDataSetChanged();
+            cursor.close();
+        }
+    }
 
     @Override
     public void onStart(){
         super.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (nowQuery == getString(R.string.action_favorite)) {
+            loadMyFavoriteMovies();
+            Log.i(LOG_TAG, "Reload my favorite movies");
+        }
     }
 
     @Override
@@ -143,15 +183,14 @@ public class MainActivityFragment extends Fragment implements LoaderCallbacks<Li
         GridLayoutManager layoutManager =
                 new GridLayoutManager(mRecycleView.getContext(), 2, GridLayout.VERTICAL, false);
         mRecycleView.setLayoutManager(layoutManager);
-        srollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
+        scrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 loadNextDataFromApi(page);
             }
         };
         mRecycleView.setAdapter(mMovieRecyclerViewAdapter);
-        mRecycleView.addOnScrollListener(srollListener);
-
+        mRecycleView.addOnScrollListener(scrollListener);
 
         ConnectivityManager connMgr = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -169,7 +208,7 @@ public class MainActivityFragment extends Fragment implements LoaderCallbacks<Li
     }
 
     private void loadNextDataFromApi(int page) {
-        if(page < 3000) {
+        if(page < 3000 && nowQuery != getString(R.string.action_favorite)) {
             mMovieLoader = new MovieLoader(getActivity(), nowQuery, page);
             loaderManager.restartLoader(MOVIE_LOADER_ID, null, this);
         }
@@ -188,13 +227,14 @@ public class MainActivityFragment extends Fragment implements LoaderCallbacks<Li
         if (mMovieLoader.getPage() == 1) {
             dataSet.clear();
             mMovieRecyclerViewAdapter.notifyDataSetChanged();
-            srollListener.resetState();
+            scrollListener.resetState();
         }
 
-        if (movies != null && !movies.isEmpty()) {
+        if (movies != null && !movies.isEmpty() && nowQuery != getString(R.string.action_favorite)) {
             int curSize = mMovieRecyclerViewAdapter.getItemCount();
             dataSet.addAll(movies);
             mMovieRecyclerViewAdapter.notifyItemRangeChanged(curSize, dataSet.size() - 1);
+            Log.i(LOG_TAG,"Movies Load finish:" + nowQuery);
         }
     }
 
@@ -202,7 +242,7 @@ public class MainActivityFragment extends Fragment implements LoaderCallbacks<Li
     public void onLoaderReset(Loader<List<Movie>> loader) {
         dataSet.clear();
         mMovieRecyclerViewAdapter.notifyDataSetChanged();
-        srollListener.resetState();
+        scrollListener.resetState();
     }
 }
 

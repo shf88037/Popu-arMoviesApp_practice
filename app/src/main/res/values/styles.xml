@@ -11,4 +11,8 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="favorite" parent="Widget.AppCompat.Light.ActionButton">
+        <item name="android:src">@drawable/button_state</item>
+    </style>
+
 </resources>
